@@ -2,9 +2,9 @@
 
 Monorepo scaffold using **pnpm workspaces**:
 
-- `apps/extension`: MV3 + Vite + React + TypeScript + Tailwind.
+- `apps/extension`: Chrome Extension (MV3) with Vite + React + TypeScript + Tailwind.
 - `apps/backend`: NestJS + Prisma + PostgreSQL (`docker-compose`).
-- `packages/shared`: Shared TypeScript contracts (+ Zod optional validators).
+- `packages/shared`: Shared TypeScript types and optional Zod schemas.
 
 ## Prerequisites
 
@@ -21,6 +21,15 @@ pnpm install
 ## Run extension (PowerShell)
 
 Dev server (UI playground):
+## Development (PowerShell)
+
+Run all workspace dev scripts in parallel:
+
+```powershell
+pnpm dev
+```
+
+Run only extension dev server:
 
 ```powershell
 pnpm --filter @skalex/extension dev
