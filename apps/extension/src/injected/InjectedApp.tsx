@@ -1,6 +1,6 @@
+import type { DomSnapshot } from '@skalex/shared';
 import { useEffect, useMemo, useState } from 'react';
 
-import type { DomSnapshot } from '@skalex/shared';
 
 import { observeSnapshot, readSnapshot } from '../wa/waAdapter';
 
