@@ -1,6 +1,6 @@
 # WhatsApp Web CRM Monorepo
 
-Monorepo scaffold using **pnpm workspaces** with:
+Monorepo scaffold using **pnpm workspaces**:
 
 - `apps/extension`: Chrome Extension (MV3) with Vite + React + TypeScript + Tailwind.
 - `apps/backend`: NestJS + Prisma + PostgreSQL (`docker-compose`).
@@ -10,7 +10,7 @@ Monorepo scaffold using **pnpm workspaces** with:
 
 - Node.js 20+
 - pnpm 9+
-- Docker Desktop (for PostgreSQL)
+- Docker Desktop
 
 ## Install dependencies (PowerShell)
 
@@ -18,6 +18,9 @@ Monorepo scaffold using **pnpm workspaces** with:
 pnpm install
 ```
 
+## Run extension (PowerShell)
+
+Dev server (UI playground):
 ## Development (PowerShell)
 
 Run all workspace dev scripts in parallel:
@@ -32,25 +35,19 @@ Run only extension dev server:
 pnpm --filter @skalex/extension dev
 ```
 
-Run only backend in watch mode:
-
-```powershell
-pnpm --filter @skalex/backend dev
-```
-
-## Build extension (PowerShell)
+Build extension bundle (content script + service worker + assets):
 
 ```powershell
 pnpm --filter @skalex/extension build
 ```
 
-Load the unpacked extension from:
+Load unpacked extension from:
 
 ```text
 apps/extension/dist
 ```
 
-## Run backend + PostgreSQL (PowerShell)
+## Run backend + Postgres (PowerShell)
 
 Start PostgreSQL:
 
@@ -58,7 +55,7 @@ Start PostgreSQL:
 docker compose -f apps/backend/docker-compose.yml up -d
 ```
 
-Run Prisma migrations:
+Run Prisma migration:
 
 ```powershell
 pnpm --filter @skalex/backend prisma:migrate
@@ -70,20 +67,35 @@ Start backend:
 pnpm --filter @skalex/backend dev
 ```
 
-## Monorepo scripts
+Health check:
+
+```text
+GET http://localhost:3000/api/health
+```
+
+## Workspace scripts (PowerShell)
 
 ```powershell
+pnpm dev
 pnpm lint
 pnpm typecheck
 pnpm build
 pnpm format
 ```
 
-## Manual QA checklist
+## Manual QA for F1 (read-only WhatsApp DOM adapter)
 
-1. Install dependencies with `pnpm install`.
-2. Run `docker compose -f apps/backend/docker-compose.yml up -d`.
-3. Run backend: `pnpm --filter @skalex/backend dev` and verify `GET /health` returns `ok`.
-4. Run extension dev server: `pnpm --filter @skalex/extension dev`.
-5. Build extension and verify `apps/extension/dist` exists.
-6. Ensure no auto-send behavior exists and send actions remain human-confirmed.
+1. Build extension: `pnpm --filter @skalex/extension build`.
+2. Open Chrome extensions page and load unpacked from `apps/extension/dist`.
+3. Open `https://web.whatsapp.com/` and log in.
+4. Verify CRM panel appears on the right and WhatsApp UI remains usable.
+5. Switch chats manually:
+   - Overview shows active chat display name + fingerprint updates.
+   - Message list updates with direction (`in/out/unknown`) and text.
+6. Scroll chat history manually (optional):
+   - Messages may refresh.
+   - Extension does not auto-scroll WhatsApp chat.
+7. Verify **NO sending behavior**:
+   - No messages are auto-sent.
+   - Extension does not focus or write to composer.
+8. Verify browser console has no repeating errors and CPU usage stays stable.

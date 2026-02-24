@@ -16,3 +16,23 @@ export const ContactSchema = z.object({
   displayName: z.string().min(1),
   phone: z.string().min(6)
 });
+
+export interface WaChatIdentity {
+  displayName: string | null;
+  waFingerprint: string;
+}
+
+export interface WaMessageLite {
+  id: string;
+  direction: 'in' | 'out' | 'unknown';
+  text: string;
+  timestamp?: string;
+}
+
+export interface DomSnapshot {
+  isWaReady: boolean;
+  composerFound: boolean;
+  activeChat: WaChatIdentity;
+  messages: WaMessageLite[];
+  capturedAt: string;
+}
