@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Skalex CRM",
+  "version": "0.1.0",
+  "description": "WhatsApp Web CRM companion extension.",
+  "action": {
+    "default_title": "Skalex CRM"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://web.whatsapp.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
