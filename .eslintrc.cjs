@@ -8,7 +8,8 @@ module.exports = {
   env: {
     es2022: true,
     node: true,
-    browser: true
+    browser: true,
+    webextensions: true, // <-- agrega esto (define chrome/browser)
   },
   plugins: ['@typescript-eslint', 'import'],
   extends: [
@@ -20,6 +21,7 @@ module.exports = {
   ],
   ignorePatterns: ['dist', 'build', 'node_modules'],
   rules: {
+    "import/no-unresolved": ["error", { ignore: ["\\.css\\?inline$"] }],
     'import/order': [
       'error',
       {
