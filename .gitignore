@@ -1,11 +1,29 @@
-node_modules
-.pnpm-store
-pnpm-lock.yaml
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+apps/*/dist/
+packages/*/dist/
+
+# TS build info / caches
+*.tsbuildinfo
+.vite/
+.turbo/
+.cache/
+
+# Env files
 .env
 .env.*
-dist
-build
-coverage
+!.env.example
+
+# Logs
 *.log
-apps/backend/prisma/dev.db
-apps/backend/prisma/dev.db-journal
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
