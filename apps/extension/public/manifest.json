@@ -8,6 +8,10 @@
   },
   "permissions": ["storage"],
   "host_permissions": ["https://web.whatsapp.com/*"],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "background": {
     "service_worker": "background.js",
     "type": "module"

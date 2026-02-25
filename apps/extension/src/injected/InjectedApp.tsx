@@ -1,8 +1,6 @@
-import type { DomSnapshot } from '@skalex/shared';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
-
-import { observeSnapshot, readSnapshot } from '../wa/waAdapter';
+import type { DomSnapshot, ExtensionOptions, WaMessageLite } from '@skalex/shared';
 
 type TabKey = 'overview' | 'pipeline' | 'tags' | 'templates' | 'ai' | 'queue';
 
@@ -19,11 +17,31 @@ function Placeholder({ title }: { title: string }): JSX.Element {
   return <p className="text-sm text-slate-300">{title} is planned for a future phase.</p>;
 }
 
-export function InjectedApp(): JSX.Element {
-  const [tab, setTab] = useState<TabKey>('overview');
-  const [snapshot, setSnapshot] = useState<DomSnapshot>(() => readSnapshot());
+function formatTimestamp(timestampMs: number | undefined): string {
+  if (!timestampMs) return 'n/a';
+  return new Date(timestampMs).toLocaleTimeString();
+}
 
-  useEffect(() => observeSnapshot(setSnapshot), []);
+function truncate(value: string, maxLength = 160): string {
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength)}…`;
+}
+
+function renderMessagePreview(message: WaMessageLite, debugMode: boolean): string {
+  if (!debugMode) return '(texto oculto)';
+
+  const content = message.text ?? message.caption ?? '';
+  return content ? truncate(content, 160) : '(sin texto)';
+}
+
+export function InjectedApp({
+  snapshot,
+  options
+}: {
+  snapshot: DomSnapshot;
+  options: ExtensionOptions;
+}): JSX.Element {
+  const [tab, setTab] = useState<TabKey>('overview');
 
   const messageCount = useMemo(() => snapshot.messages.length, [snapshot.messages.length]);
 
@@ -53,16 +71,15 @@ export function InjectedApp(): JSX.Element {
           <div className="space-y-3 text-sm">
             <div className="rounded border border-slate-700 bg-slate-900 p-3">
               <p>
-                <span className="font-semibold">WA Ready:</span>{' '}
-                {snapshot.isWaReady ? 'true' : 'false'}
+                <span className="font-semibold">WA Ready:</span> {snapshot.isWaReady ? 'true' : 'false'}
               </p>
               <p>
                 <span className="font-semibold">Active chat:</span>{' '}
-                {snapshot.activeChat.displayName ?? 'Unknown'}
+                {snapshot.activeChat?.displayName ?? 'Unknown'}
               </p>
               <p className="break-all">
                 <span className="font-semibold">Fingerprint:</span>{' '}
-                {snapshot.activeChat.waFingerprint}
+                {snapshot.activeChat?.waFingerprint ?? 'n/a'}
               </p>
               <p>
                 <span className="font-semibold">composerFound:</span>{' '}
@@ -71,15 +88,32 @@ export function InjectedApp(): JSX.Element {
               <p>
                 <span className="font-semibold">Messages captured:</span> {messageCount}
               </p>
+              <p>
+                <span className="font-semibold">maxMessages:</span> {options.maxMessages}
+              </p>
+              <p>
+                <span className="font-semibold">debugMode:</span> {options.debugMode ? 'true' : 'false'}
+              </p>
+              <p>
+                <span className="font-semibold">parserDegraded:</span>{' '}
+                {snapshot.flags.degraded ? 'true' : 'false'}
+              </p>
+              <button
+                type="button"
+                className="mt-2 rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white"
+                onClick={() => chrome.runtime.openOptionsPage()}
+              >
+                Abrir opciones
+              </button>
             </div>
 
             <div className="space-y-2">
               {snapshot.messages.map((message) => (
                 <article key={message.id} className="rounded border border-slate-800 bg-slate-900 p-2">
                   <p className="text-xs text-slate-400">
-                    [{message.direction}] {message.timestamp ?? 'time n/a'}
+                    [{message.direction}] [{message.kind}] {formatTimestamp(message.timestampMs)}
                   </p>
-                  <p className="text-sm text-slate-200">{message.text}</p>
+                  <p className="text-sm text-slate-200">{renderMessagePreview(message, options.debugMode)}</p>
                 </article>
               ))}
             </div>
