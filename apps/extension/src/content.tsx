@@ -51,16 +51,25 @@ function ensureShadowRoot(): ShadowRoot {
     document.body.append(host);
   }
 
-  const shadowRoot = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
+  // Re-aplicar estilos siempre (idempotente)
+  host.style.position = 'fixed';
+  host.style.top = '0';
+  host.style.right = '0';
+  host.style.zIndex = '2147483647';
+
+  return host;
+}
+
+function ensureShadowRoot(host: HTMLElement): ShadowRoot {
+  return host.shadowRoot ?? host.attachShadow({ mode: 'open' });
+}
 
   if (!shadowRoot.getElementById('skalex-crm-style')) {
     const style = document.createElement('style');
-    style.id = 'skalex-crm-style';
+    style.id = STYLE_ID;
     style.textContent = cssText;
     shadowRoot.append(style);
   }
-
-  return shadowRoot;
 }
 
 function ContentRoot(): JSX.Element {
@@ -103,11 +112,9 @@ function mount(): void {
   const shadowRoot = ensureShadowRoot();
   let root = shadowRoot.getElementById(ROOT_ID);
 
-  if (!root) {
-    root = document.createElement('div');
-    root.id = ROOT_ID;
-    shadowRoot.append(root);
-  }
+  // Idempotencia: si ya montamos, no dupliques panel
+  if (root.getAttribute(MOUNT_ATTR) === '1') return;
+  root.setAttribute(MOUNT_ATTR, '1');
 
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
